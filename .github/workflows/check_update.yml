@@ -24,16 +24,19 @@ jobs:
           VERSION=$(echo $RESPONSE | jq -r '.result.data.version')
           PUB_DATE=$(echo $RESPONSE | jq -r '.result.data.pub_date')
 
-          NOTES="Published on: $PUB_DATE\n\n**Download links:**\n"
-
-          for PLATFORM in $(echo $RESPONSE | jq -r '.result.data.platforms | keys[]'); do
-            URL=$(echo $RESPONSE | jq -r ".result.data.platforms[\"$PLATFORM\"].url")
-            NOTES+="- **$PLATFORM:** [Link]($URL)\n"
-          done
-
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "PUB_DATE=$PUB_DATE" >> $GITHUB_ENV
-          echo "NOTES=$NOTES" >> $GITHUB_ENV
+          {
+            echo "NOTES<<EOF"
+            echo "Published on: $PUB_DATE"
+            echo ""
+            echo "**Download links:**"
+            for PLATFORM in $(echo $RESPONSE | jq -r '.result.data.platforms | keys[]'); do
+              URL=$(echo $RESPONSE | jq -r ".result.data.platforms[\"$PLATFORM\"].url")
+              echo "- **$PLATFORM:** [Link]($URL)"
+            done
+            echo "EOF"
+          } >> $GITHUB_ENV
 
       - name: Check if release exists
         id: check_release
