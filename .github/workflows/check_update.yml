@@ -24,11 +24,11 @@ jobs:
           VERSION=$(echo $RESPONSE | jq -r '.result.data.version')
           PUB_DATE=$(echo $RESPONSE | jq -r '.result.data.pub_date')
 
-          NOTES="Published on: $PUB_DATE%0A%0A**Download links:**%0A"
+          NOTES="Published on: $PUB_DATE\n\n**Download links:**\n"
 
           for PLATFORM in $(echo $RESPONSE | jq -r '.result.data.platforms | keys[]'); do
             URL=$(echo $RESPONSE | jq -r ".result.data.platforms[\"$PLATFORM\"].url")
-            NOTES+="- **$PLATFORM:** [Link]($URL)%0A"
+            NOTES+="- **$PLATFORM:** [Link]($URL)\n"
           done
 
           echo "VERSION=$VERSION" >> $GITHUB_ENV
@@ -72,12 +72,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Send message to Telegram
-        uses: akeylimepie/telegram-action@main
-        with:
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message_thread_id: ${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}
-          text: |
-            New version ${{ env.VERSION }} released!
-            Published on: ${{ env.PUB_DATE }}
+#      - name: Send message to Telegram
+#        uses: akeylimepie/telegram-action@main
+#        with:
+#          token: ${{ secrets.TELEGRAM_TOKEN }}
+#          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+#          message_thread_id: ${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}
+#          text: |
+#            New version ${{ env.VERSION }} released!
+#            Published on: ${{ env.PUB_DATE }}
